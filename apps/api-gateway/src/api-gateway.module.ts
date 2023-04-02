@@ -1,4 +1,4 @@
-import { HttpException, Module } from '@nestjs/common';
+import { HttpException, HttpStatus, Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { ScheduleModule } from '@nestjs/schedule';
 import { memoryStorage } from 'multer';
@@ -19,6 +19,7 @@ import { KafkaServer } from '@libs/kafka/kafka.server';
 import { EEnvKey } from '@libs/configs/env.constant';
 import { getKafkaServerOptions } from '@libs/kafka/kafka.config';
 import { Web3Module } from '@libs/web3';
+import { extname } from 'path';
 
 @Module({
   imports: [
@@ -47,6 +48,21 @@ import { Web3Module } from '@libs/web3';
     }),
     MulterModule.register({
       storage: memoryStorage(),
+      fileFilter: (req: any, file: any, cb: any) => {
+        if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          // Allow storage of file
+          cb(null, true);
+        } else {
+          // Reject file
+          cb(
+            new HttpException(
+              `Unsupported file type ${extname(file.originalname)}`,
+              HttpStatus.BAD_REQUEST,
+            ),
+            false,
+          );
+        }
+      },
     }),
     ScheduleModule.forRoot(),
     Web3Module.forRootAsync({
@@ -75,20 +91,21 @@ import { Web3Module } from '@libs/web3';
           ],
         }),
     },
-    // {
-    //   provide: KafkaServer,
-    //   useFactory: (configService: ConfigService) => {
-    //     const uri = configService.get<string>(EEnvKey.KAFKA_URI);
-    //     return new KafkaServer(
-    //       getKafkaServerOptions(
-    //         EEnvKey.KAFKA_GROUP_ID,
-    //         EEnvKey.KAFKA_CLIENT_ID,
-    //         [uri],
-    //       ).options,
-    //     );
-    //   },
-    // },
+    {
+      provide: KafkaServer,
+      useFactory: (configService: ConfigService) => {
+        const uri = configService.get<string>(EEnvKey.KAFKA_URI);
+        return new KafkaServer(
+          getKafkaServerOptions(
+            EEnvKey.KAFKA_GROUP_ID,
+            EEnvKey.KAFKA_CLIENT_ID,
+            [uri],
+          ).options,
+        );
+      },
+      inject: [ConfigService],
+    },
   ],
-  // exports: [KafkaServer],
+  exports: [KafkaServer],
 })
 export class ApiGatewayModule {}

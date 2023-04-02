@@ -19,10 +19,10 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
     ApiGatewayModule,
   );
-  // const kafkaServer = await app.resolve<KafkaServer>(KafkaServer);
-  // app.connectMicroservice<MicroserviceOptions>({
-  //   strategy: kafkaServer,
-  // });
+  const kafkaServer = await app.resolve<KafkaServer>(KafkaServer);
+  app.connectMicroservice<MicroserviceOptions>({
+    strategy: kafkaServer,
+  });
   const configService = app.get(ConfigService);
   const loggingService = app.get(LoggerService);
   const logger = loggingService.getLogger('api-gateway');
@@ -41,7 +41,7 @@ async function bootstrap() {
   if (configService.get(EEnvKey.NODE_ENV) !== 'production') {
     initSwagger(app, configService);
   }
-  // await app.startAllMicroservices();
+  await app.startAllMicroservices();
   await app.listen(configService.get<number>(EEnvKey.PORT) || 3000);
 
   logger.info(`Application is running on: ${await app.getUrl()}`);

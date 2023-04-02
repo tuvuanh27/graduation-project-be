@@ -1,5 +1,6 @@
 import { applyDecorators, HttpStatus, Type } from '@nestjs/common';
 import {
+  ApiBody,
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
@@ -64,6 +65,22 @@ export const ApiDeleteOperation = createApiOperation({
 export const ApiBulkDeleteOperation = createApiOperation({
   summary: 'Delete many record',
 });
+
+export const ApiFile =
+  (fileName = 'file'): MethodDecorator =>
+  (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+    ApiBody({
+      schema: {
+        type: 'object',
+        properties: {
+          [fileName]: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    })(target, propertyKey, descriptor);
+  };
 
 export enum EApiOkResponsePayload {
   ARRAY = 'array',

@@ -1,8 +1,10 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { KafkaService } from '@libs/kafka';
-import { LoggerService } from '@libs/shared';
+import { BadRequestException, LoggerService } from '@libs/shared';
 import { Web3Service } from '@libs/web3';
 import Web3 from 'web3';
+import { CreatePendingNftDto } from '@app/modules/nft/dtos/create-pending-nft.dto';
+import { CloudinaryService } from '@libs/shared/modules/cloudinary';
 
 @Injectable()
 export class NftService implements OnModuleInit {
@@ -11,6 +13,7 @@ export class NftService implements OnModuleInit {
     private readonly kafkaService: KafkaService,
     private loggerService: LoggerService,
     private web3Service: Web3Service,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
   private readonly logger = this.loggerService.getLogger(NftService.name);
 
@@ -19,12 +22,33 @@ export class NftService implements OnModuleInit {
     this.web3 = this.web3Service.getClient();
   }
 
-  async testKafka(): Promise<void> {
+  async testKafka(data: CreatePendingNftDto): Promise<void> {
     await this.kafkaService.send('test', {
-      data: 'test',
+      data: data,
       createdAt: Date.now(),
     });
     this.logger.log('test kafka');
     return;
+  }
+
+  async uploadNft(pendingNft: CreatePendingNftDto, file: Express.Multer.File) {
+    // TODO: move it to queue
+    try {
+      const uploadedImage = await this.cloudinaryService.uploadImage(file);
+      const { secure_url: secureUrl } = uploadedImage;
+
+      await this.kafkaService.send('pending-nft', {
+        data: {
+          ...pendingNft,
+          image: secureUrl,
+        },
+        createdAt: Date.now(),
+      });
+
+      return true;
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException({ message: error.message });
+    }
   }
 }
