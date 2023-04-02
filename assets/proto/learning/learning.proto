@@ -1,0 +1,73 @@
+syntax = "proto3";
+//import "google/protobuf/empty.proto";
+//import "google/protobuf/any.proto";
+
+package learning;
+
+
+// Learning main Service
+service LearningService {
+    rpc GetLearning (GetLearningRequest) returns (GetLearningResponse) {}
+}
+
+message GetLearningRequest {
+    string name = 1;
+}
+
+message GetLearningResponse {
+    string message = 1;
+}
+
+// Article Service
+service ArticleService {
+    rpc GetArticle (GetArticleRequest) returns (GetArticleResponse) {}
+    rpc CreateArticle (CreateArticleRequest) returns (CreateArticleResponse) {}
+    rpc ListArticle (ListArticleRequest) returns (ListArticleResponse) {}
+
+}
+
+message GetArticleRequest {
+    string id = 1;
+}
+
+message GetArticleResponse {
+    string id = 1;
+    string content = 2;
+    string title = 3;
+}
+
+
+message CreateArticleRequest {
+    string content = 2;
+    string title = 3;
+//    repeated google.protobuf.Any meta = 4;
+
+    oneof fields {
+        int32 test = 5;
+        string test2 = 6;
+    }
+//    map<string, int32> map_field = 9;
+
+}
+
+message CreateArticleResponse {
+    string id = 1;
+}
+
+message ListArticleRequest {
+    oneof fields {
+        string content = 1;
+        string author = 2;
+    }
+}
+message ListArticleResponse {
+    message Articles {
+        string id = 1;
+        string author_id = 2;
+        string content = 3;
+        string title = 4;
+    }
+    repeated Articles articles = 1;
+}
+
+// another service
