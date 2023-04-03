@@ -7,9 +7,15 @@ import { KafkaServer } from '@libs/kafka/kafka.server';
 import { EEnvKey } from '@libs/configs/env.constant';
 import { getKafkaServerOptions } from '@libs/kafka/kafka.config';
 import { ConfigService } from '@nestjs/config';
+import { IpfsLibModule } from '@libs/ipfs-lib';
 
 @Module({
-  imports: [ConfigurationModule, DatabaseModule, LoggingModule],
+  imports: [
+    ConfigurationModule,
+    DatabaseModule,
+    LoggingModule,
+    IpfsLibModule.register({}, true),
+  ],
   controllers: [UploaderController],
   providers: [
     UploaderService,

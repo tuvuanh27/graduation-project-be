@@ -1,6 +1,7 @@
 import { lastValueFrom } from 'rxjs';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { KafkaClient } from './kafka.client';
+import { IKafkaPayload } from '@libs/kafka/types';
 
 @Injectable()
 export class KafkaService implements OnModuleInit {
@@ -19,7 +20,7 @@ export class KafkaService implements OnModuleInit {
    * @param message
    * @returns
    */
-  send<T>(topic: string, message: T) {
+  send<T>(topic: string, message: IKafkaPayload<T>) {
     return lastValueFrom(this.kafka.emit(topic, message));
   }
 

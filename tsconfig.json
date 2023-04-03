@@ -14,96 +14,38 @@
     "baseUrl": "./",
     "incremental": true,
     "paths": {
-      "@app": [
-        "apps/api-gateway/src"
-      ],
-      "@app/*": [
-        "apps/api-gateway/src/*"
-      ],
-      "@libs": [
-        "libs"
-      ],
-      "@libs/*": [
-        "libs/*"
-      ],
-      "@libs/shared": [
-        "libs/shared/src"
-      ],
-      "@libs/shared/*": [
-        "libs/shared/src/*"
-      ],
-      "@libs/infra": [
-        "libs/infra/src"
-      ],
-      "@libs/infra/*": [
-        "libs/infra/src/*"
-      ],
-      "@libs/configs": [
-        "libs/configs/src"
-      ],
-      "@libs/configs/*": [
-        "libs/configs/src/*"
-      ],
-      "@assets": [
-        "assets/"
-      ],
-      "@assets/*": [
-        "assets/*"
-      ],
-      "@app/constants": [
-        "apps/api-gateway/src/constants"
-      ],
-      "@app/constants/*": [
-        "apps/api-gateway/src/constants/*"
-      ],
-      "@app/modules": [
-        "apps/api-gateway/src/modules"
-      ],
-      "@app/modules/*": [
-        "apps/api-gateway/src/modules/*"
-      ],
-      "@app/learning": [
-        "apps/learning/src"
-      ],
-      "@app/learning/*": [
-        "apps/learning/src/*"
-      ],
-      "@libs/grpc-client": [
-        "libs/grpc-client/src"
-      ],
-      "@libs/grpc-client/*": [
-        "libs/grpc-client/src/*"
-      ],
-      "@libs/queue": [
-        "libs/queue/src"
-      ],
-      "@libs/queue/*": [
-        "libs/queue/src/*"
-      ],
-      "@libs/redis": [
-        "libs/redis/src"
-      ],
-      "@libs/redis/*": [
-        "libs/redis/src/*"
-      ],
-      "@libs/web3": [
-        "libs/web3/src"
-      ],
-      "@libs/web3/*": [
-        "libs/web3/src/*"
-      ],
-      "@libs/database": [
-        "libs/database/src"
-      ],
-      "@libs/database/*": [
-        "libs/database/src/*"
-      ],
-      "@libs/kafka": [
-        "libs/kafka/src"
-      ],
-      "@libs/kafka/*": [
-        "libs/kafka/src/*"
-      ]
+      "@app": ["apps/api-gateway/src"],
+      "@app/*": ["apps/api-gateway/src/*"],
+      "@libs": ["libs"],
+      "@libs/*": ["libs/*"],
+      "@libs/shared": ["libs/shared/src"],
+      "@libs/shared/*": ["libs/shared/src/*"],
+      "@libs/infra": ["libs/infra/src"],
+      "@libs/infra/*": ["libs/infra/src/*"],
+      "@libs/configs": ["libs/configs/src"],
+      "@libs/configs/*": ["libs/configs/src/*"],
+      "@assets": ["assets/"],
+      "@assets/*": ["assets/*"],
+      "@app/constants": ["apps/api-gateway/src/constants"],
+      "@app/constants/*": ["apps/api-gateway/src/constants/*"],
+      "@app/modules": ["apps/api-gateway/src/modules"],
+      "@app/modules/*": ["apps/api-gateway/src/modules/*"],
+      "@app/learning": ["apps/learning/src"],
+      "@app/learning/*": ["apps/learning/src/*"],
+      "@libs/grpc-client": ["libs/grpc-client/src"],
+      "@libs/grpc-client/*": ["libs/grpc-client/src/*"],
+      "@libs/queue": ["libs/queue/src"],
+      "@libs/queue/*": ["libs/queue/src/*"],
+      "@libs/redis": ["libs/redis/src"],
+      "@libs/redis/*": ["libs/redis/src/*"],
+      "@libs/web3": ["libs/web3/src"],
+      "@libs/web3/*": ["libs/web3/src/*"],
+      "@libs/database": ["libs/database/src"],
+      "@libs/database/*": ["libs/database/src/*"],
+      "@libs/kafka": ["libs/kafka/src"],
+      "@libs/kafka/*": ["libs/kafka/src/*"],
+      "@libs/ipfs-lib": ["libs/ipfs-lib/src"],
+      "@libs/ipfs-lib/*": ["libs/ipfs-lib/src/*"]
     }
   }
 }

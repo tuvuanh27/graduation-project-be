@@ -30,6 +30,7 @@
   "dependencies": {
     "@grpc/grpc-js": "1.8.12",
     "@grpc/proto-loader": "^0.7.5",
+    "@mfsoftworks/nestjs-ipfs": "^1.0.2",
     "@nestjs/bull": "^0.6.3",
     "@nestjs/cli": "9.2.0",
     "@nestjs/common": "9.3.12",
@@ -58,7 +59,7 @@
     "fp-ts": "^2.13.1",
     "husky": "8.0.1",
     "ioredis": "^5.3.1",
-    "ipfs-core": "^0.18.0",
+    "ipfs": "0.66.0",
     "joi": "17.8.3",
     "kafkajs": "^2.2.4",
     "log4js": "6.8.0",
@@ -139,7 +140,8 @@
       "^@libs/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
       "^@libs/web3(|/.*)$": "<rootDir>/libs/web3/src/$1",
       "^@libs/database(|/.*)$": "<rootDir>/libs/database/src/$1",
-      "^@libs/kafka(|/.*)$": "<rootDir>/libs/kafka/src/$1"
+      "^@libs/kafka(|/.*)$": "<rootDir>/libs/kafka/src/$1",
+      "^@libs/ipfs-lib(|/.*)$": "<rootDir>/libs/ipfs-lib/src/$1"
     }
   }
 }

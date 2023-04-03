@@ -3,9 +3,7 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "apps/api-gateway",
   "compilerOptions": {
-    "assets": [
-      "**/*.proto"
-    ],
+    "assets": ["**/*.proto"],
     "deleteOutDir": true,
     "webpack": true,
     "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
@@ -64,15 +62,6 @@
       "sourceRoot": "libs/grpc-client/src",
       "compilerOptions": {
         "tsConfigPath": "libs/grpc-client/tsconfig.lib.json"
-      }
-    },
-    "ipfs": {
-      "type": "application",
-      "root": "apps/ipfs",
-      "entryFile": "main",
-      "sourceRoot": "apps/ipfs/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/ipfs/tsconfig.app.json"
       }
     },
     "crawler": {
@@ -136,6 +125,15 @@
       "sourceRoot": "libs/kafka/src",
       "compilerOptions": {
         "tsConfigPath": "libs/kafka/tsconfig.lib.json"
+      }
+    },
+    "ipfs-lib": {
+      "type": "library",
+      "root": "libs/ipfs-lib",
+      "entryFile": "index",
+      "sourceRoot": "libs/ipfs-lib/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/ipfs-lib/tsconfig.lib.json"
       }
     }
   }

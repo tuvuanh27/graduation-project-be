@@ -5,6 +5,9 @@ import { Web3Service } from '@libs/web3';
 import Web3 from 'web3';
 import { CreatePendingNftDto } from '@app/modules/nft/dtos/create-pending-nft.dto';
 import { CloudinaryService } from '@libs/shared/modules/cloudinary';
+import { UploadApiResponse } from 'cloudinary';
+import { KafkaTopic } from '@libs/kafka/constants';
+import { PendingNftKafkaPayload } from '@libs/kafka/types';
 
 @Injectable()
 export class NftService implements OnModuleInit {
@@ -23,7 +26,7 @@ export class NftService implements OnModuleInit {
   }
 
   async testKafka(data: CreatePendingNftDto): Promise<void> {
-    await this.kafkaService.send('test', {
+    await this.kafkaService.send(KafkaTopic.TOPIC_TEST, {
       data: data,
       createdAt: Date.now(),
     });
@@ -34,16 +37,20 @@ export class NftService implements OnModuleInit {
   async uploadNft(pendingNft: CreatePendingNftDto, file: Express.Multer.File) {
     // TODO: move it to queue
     try {
-      const uploadedImage = await this.cloudinaryService.uploadImage(file);
+      const uploadedImage: UploadApiResponse =
+        await this.cloudinaryService.uploadImage(file);
       const { secure_url: secureUrl } = uploadedImage;
 
-      await this.kafkaService.send('pending-nft', {
-        data: {
-          ...pendingNft,
-          image: secureUrl,
+      await this.kafkaService.send<PendingNftKafkaPayload>(
+        KafkaTopic.PENDING_NFT,
+        {
+          data: {
+            ...pendingNft,
+            image: secureUrl,
+          },
+          createdAt: Date.now(),
         },
-        createdAt: Date.now(),
-      });
+      );
 
       return true;
     } catch (error) {
