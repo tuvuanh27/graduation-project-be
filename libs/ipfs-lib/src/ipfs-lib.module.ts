@@ -2,16 +2,11 @@ import { Module, DynamicModule, Global, Provider, Type } from '@nestjs/common';
 import { IPFSModuleOptionsFactory, IPFSModuleAsyncOptions } from './interfaces';
 import { IpfsLibService } from '@libs/ipfs-lib/ipfs-lib.service';
 import { IPFS_MODULE_OPTIONS } from '@libs/ipfs-lib/ipfs-lib.constants';
-import * as IpfsCore from 'ipfs-core';
 
 @Global()
 @Module({})
 export class IpfsLibModule {
-  // DEBUG: Set options to IPFS options type when types implemented
-  static register(
-    options: IpfsCore.Options = {},
-    waitForNode = false,
-  ): DynamicModule {
+  static register(options: any = {}, waitForNode = false): DynamicModule {
     return {
       module: IpfsLibModule,
       providers: [

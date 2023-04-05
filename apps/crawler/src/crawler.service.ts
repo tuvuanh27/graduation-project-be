@@ -48,25 +48,30 @@ export class CrawlerService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    console.log('CrawlerService initialized');
-    this.blockCrawled = (
-      await this.latestBlockRepository.getLatestBlockNftCrawled()
-    )?.currentBlockNumber;
-    if (!this.blockCrawled) {
+    this.logger.debug('Crawler service initialized');
+
+    // check if started crawl before, if not, create new
+    const latestCrawledBlock =
+      await this.latestBlockRepository.getLatestBlockNftCrawled();
+
+    if (!latestCrawledBlock) {
       await this.latestBlockRepository.createLatestBlockNftCrawled({
         queueName: this.queueName,
         currentBlockNumber: this.configService.get<number>(EEnvKey.START_BLOCK),
         blockPerProcess: 10,
       });
-      this.blockCrawled = this.configService.get<number>(EEnvKey.START_BLOCK);
     }
-    setInterval(async () => {
-      const currentBlockNumber = await this.getCurrentBlockNumber();
-      const timestamp = await this.getBlockTime(currentBlockNumber);
-      this.logger.log(
-        `Current block number: ${currentBlockNumber} - ${timestamp}`,
-      );
-    }, 1000);
+
+    const isCrawlLatestBlock = this.configService.get<boolean>(
+      EEnvKey.CRAWL_LATEST,
+    );
+    if (isCrawlLatestBlock) {
+      this.blockCrawled = await this.getCurrentBlockNumber();
+    } else {
+      this.blockCrawled = (
+        await this.latestBlockRepository.getLatestBlockNftCrawled()
+      )?.currentBlockNumber;
+    }
     // await this.produceJobCrawler();
   }
 

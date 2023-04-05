@@ -8,3 +8,10 @@ export const CurrentUser = createParamDecorator(
     return req.owner;
   },
 );
+
+export const CurrentAddress = createParamDecorator(
+  (data: any, ctx: ExecutionContext) => {
+    const req = ctx.switchToHttp().getRequest();
+    return req.address as string;
+  },
+);

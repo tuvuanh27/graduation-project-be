@@ -2,7 +2,6 @@
   "name": "boiler",
   "version": "0.0.1",
   "description": "",
-  "author": "nguyenthaihoc.dev@gmail.com",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -69,9 +68,11 @@
     "nanoid": "3.3.1",
     "nestjs-console": "8.0.0",
     "nestjs-request-context": "2.1.0",
+    "node-fetch": "2",
     "oxide.ts": "1.1.0",
     "reflect-metadata": "0.1.13",
     "rxjs": "7.2.0",
+    "tsimportlib": "^0.0.3",
     "web3": "^1.9.0"
   },
   "lint-staged": {

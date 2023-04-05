@@ -14,6 +14,10 @@ export class NftPendingRepository extends BaseRepository {
     super();
   }
 
+  getNftPendingById(id: string): Promise<NftPendingDocument> {
+    return this.nftPendingDocumentModel.findById(id).exec();
+  }
+
   async createNftPending(
     nftPendingDocument: Partial<NftPendingDocument>,
   ): Promise<NftPendingDocument> {
@@ -29,5 +33,13 @@ export class NftPendingRepository extends BaseRepository {
         new: true,
       })
       .exec();
+  }
+
+  getNftPendingByOwner(owner: string): Promise<NftPendingDocument[]> {
+    return this.nftPendingDocumentModel.find({ owner }).exec();
+  }
+
+  deleteNftPending(pendingId: string) {
+    return this.nftPendingDocumentModel.deleteOne({ _id: pendingId }).exec();
   }
 }

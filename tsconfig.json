@@ -13,6 +13,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
+    "moduleResolution": "node16",
     "paths": {
       "@app": ["apps/api-gateway/src"],
       "@app/*": ["apps/api-gateway/src/*"],

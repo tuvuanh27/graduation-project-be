@@ -15,9 +15,7 @@ import { ApiGatewayService } from './api-gateway.service';
 import { MODULES } from './modules';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { KafkaServer } from '@libs/kafka/kafka.server';
 import { EEnvKey } from '@libs/configs/env.constant';
-import { getKafkaServerOptions } from '@libs/kafka/kafka.config';
 import { Web3Module } from '@libs/web3';
 import { extname } from 'path';
 
@@ -91,21 +89,6 @@ import { extname } from 'path';
           ],
         }),
     },
-    {
-      provide: KafkaServer,
-      useFactory: (configService: ConfigService) => {
-        const uri = configService.get<string>(EEnvKey.KAFKA_URI);
-        return new KafkaServer(
-          getKafkaServerOptions(
-            EEnvKey.KAFKA_GROUP_ID,
-            EEnvKey.KAFKA_CLIENT_ID,
-            [uri],
-          ).options,
-        );
-      },
-      inject: [ConfigService],
-    },
   ],
-  exports: [KafkaServer],
 })
 export class ApiGatewayModule {}

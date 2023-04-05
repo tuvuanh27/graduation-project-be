@@ -8,6 +8,11 @@ import { CloudinaryService } from '@libs/shared/modules/cloudinary';
 import { UploadApiResponse } from 'cloudinary';
 import { KafkaTopic } from '@libs/kafka/constants';
 import { PendingNftKafkaPayload } from '@libs/kafka/types';
+import { NftRepository } from '@libs/database/repositories/nft.repository';
+import { NftPendingRepository } from '@libs/database/repositories/nft-pending.repository';
+import { NFTMetadata } from '@libs/database/entities';
+import { instanceToPlain } from 'class-transformer';
+import { UpdatePendingNftDto } from '@app/modules/nft/dtos/update-pending-nft.dto';
 
 @Injectable()
 export class NftService implements OnModuleInit {
@@ -17,6 +22,8 @@ export class NftService implements OnModuleInit {
     private loggerService: LoggerService,
     private web3Service: Web3Service,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly nftRepository: NftRepository,
+    private readonly nftPendingRepository: NftPendingRepository,
   ) {}
   private readonly logger = this.loggerService.getLogger(NftService.name);
 
@@ -25,37 +32,128 @@ export class NftService implements OnModuleInit {
     this.web3 = this.web3Service.getClient();
   }
 
-  async testKafka(data: CreatePendingNftDto): Promise<void> {
+  async testKafka(): Promise<void> {
     await this.kafkaService.send(KafkaTopic.TOPIC_TEST, {
-      data: data,
+      data: 'test kafka',
       createdAt: Date.now(),
     });
     this.logger.log('test kafka');
     return;
   }
 
-  async uploadNft(pendingNft: CreatePendingNftDto, file: Express.Multer.File) {
-    // TODO: move it to queue
+  async createPending(
+    pendingNft: CreatePendingNftDto,
+    file: Express.Multer.File,
+    address: string,
+  ) {
     try {
       const uploadedImage: UploadApiResponse =
         await this.cloudinaryService.uploadImage(file);
       const { secure_url: secureUrl } = uploadedImage;
 
-      await this.kafkaService.send<PendingNftKafkaPayload>(
-        KafkaTopic.PENDING_NFT,
-        {
-          data: {
-            ...pendingNft,
-            image: secureUrl,
-          },
-          createdAt: Date.now(),
-        },
-      );
+      const metadata: NFTMetadata = {
+        name: pendingNft.name,
+        description: pendingNft.description,
+        image: secureUrl,
+      };
+      pendingNft.externalUrl && (metadata.externalUrl = pendingNft.externalUrl);
+      pendingNft.attributes && (metadata.attributes = pendingNft.attributes);
 
-      return true;
+      return this.nftPendingRepository.createNftPending({
+        uri: secureUrl,
+        isPublic: pendingNft.isPublic,
+        owner: address,
+        metadata,
+      });
     } catch (error) {
       this.logger.error(error);
       throw new BadRequestException({ message: error.message });
     }
+  }
+
+  async createNftOnChain(nftPendingId: string) {
+    // TODO: move it to queue
+    try {
+      const pendingNft = await this.nftPendingRepository.getNftPendingById(
+        nftPendingId,
+      );
+      if (!pendingNft) {
+        throw new BadRequestException({ message: 'Nft pending not found' });
+      }
+
+      await this.kafkaService.send<PendingNftKafkaPayload>(
+        KafkaTopic.PENDING_NFT,
+        {
+          data: {
+            id: pendingNft._id,
+            name: pendingNft.metadata.name,
+            description: pendingNft.metadata.description,
+            image: pendingNft.uri,
+            isPublic: pendingNft.isPublic,
+            owner: pendingNft.owner,
+            ...(pendingNft.metadata.externalUrl
+              ? { externalUrl: pendingNft.metadata.externalUrl }
+              : {}),
+            ...(pendingNft.metadata.attributes
+              ? { attributes: pendingNft.metadata.attributes }
+              : {}),
+          },
+          createdAt: Date.now(),
+        },
+      );
+      return true;
+    } catch (error) {
+      this.logger.error(`[createNftOnChain] ${error.message}`);
+      throw new BadRequestException({ message: error.message });
+    }
+  }
+
+  getListPendingNftByOwner(address: string) {
+    return this.nftPendingRepository.getNftPendingByOwner(address);
+  }
+
+  async getListNft(tokenIds: string[], address: string) {
+    return this.nftRepository.getNftByTokenIds(tokenIds, address);
+  }
+
+  getPublicNft() {
+    return this.nftRepository.getPublicNft();
+  }
+
+  async getNftsByOwner(owner: string) {
+    return this.nftRepository.getNftsByOwner(owner);
+  }
+
+  async updateNft(
+    pendingId: string,
+    data: UpdatePendingNftDto,
+    address: string,
+  ) {
+    // check owner
+    const pendingNft = await this.nftPendingRepository.getNftPendingById(
+      pendingId,
+    );
+    if (pendingNft.owner !== address) {
+      throw new BadRequestException({ message: 'Not authorized' });
+    }
+
+    return this.nftPendingRepository.updateNftPending(pendingId, data);
+  }
+
+  async searchNftOnchain(q: string) {
+    // full text search in nft name or nft description of all public nft
+    return this.nftRepository.searchNftOnchain(q);
+  }
+
+  async deletePendingNft(pendingId: string, address: string) {
+    // check owner
+    const pendingNft = await this.nftPendingRepository.getNftPendingById(
+      pendingId,
+    );
+    if (pendingNft.owner !== address) {
+      throw new BadRequestException({ message: 'Not authorized' });
+    }
+
+    return this.nftPendingRepository.deleteNftPending(pendingId);
   }
 }

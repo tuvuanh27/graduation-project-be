@@ -12,22 +12,19 @@ import { initSwagger } from '@libs/infra/swagger';
 import { ApiGatewayModule } from './api-gateway.module';
 import { LoggerService } from '@libs/shared/modules';
 import { useMorgan } from '@libs/infra/middleware/morgan.middleware';
-import { KafkaServer } from '@libs/kafka/kafka.server';
-import { MicroserviceOptions } from '@nestjs/microservices';
+import { AddressInterceptor } from '@libs/infra/interceptors/address.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
     ApiGatewayModule,
   );
-  const kafkaServer = await app.resolve<KafkaServer>(KafkaServer);
-  app.connectMicroservice<MicroserviceOptions>({
-    strategy: kafkaServer,
-  });
+
   const configService = app.get(ConfigService);
   const loggingService = app.get(LoggerService);
   const logger = loggingService.getLogger('api-gateway');
   app.useGlobalInterceptors(
     new ResponseTransformInterceptor(loggingService, configService),
+    new AddressInterceptor(),
   );
   app.useGlobalFilters(new HttpUnknownExceptionsFilter(loggingService));
   app.useGlobalFilters(new HttpExceptionFilter(loggingService));
@@ -41,7 +38,6 @@ async function bootstrap() {
   if (configService.get(EEnvKey.NODE_ENV) !== 'production') {
     initSwagger(app, configService);
   }
-  await app.startAllMicroservices();
   await app.listen(configService.get<number>(EEnvKey.PORT) || 3000);
 
   logger.info(`Application is running on: ${await app.getUrl()}`);

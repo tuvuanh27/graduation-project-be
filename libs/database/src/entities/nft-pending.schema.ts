@@ -20,14 +20,17 @@ export class NftPending extends BaseSchema {
   @Prop({ required: true, type: Boolean })
   isPublic: boolean;
 
-  @Prop({ required: false, type: String })
-  description: string;
-
   @Prop({ required: true, type: String })
   owner: string;
 
   @Prop({ required: false, type: NFTMetadata })
   metadata: NFTMetadata;
+
+  @Prop({ required: false, type: String })
+  ipfsHash: string;
+
+  @Prop({ required: true, default: false, type: Boolean })
+  isUploaded: boolean;
 }
 
 export const NftPendingSchemaInstance =

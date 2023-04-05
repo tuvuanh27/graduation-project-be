@@ -35,6 +35,12 @@ export type Upgraded = ContractEventLog<{
   implementation: string;
   0: string;
 }>;
+export type AddViewer = ContractEventLog<{
+  tokenId: string;
+  viewer: string;
+  0: string;
+  1: string;
+}>;
 export type Approval = ContractEventLog<{
   owner: string;
   approved: string;
@@ -70,6 +76,12 @@ export type OwnershipTransferred = ContractEventLog<{
 export type Paused = ContractEventLog<{
   account: string;
   0: string;
+}>;
+export type RemoveViewer = ContractEventLog<{
+  tokenId: string;
+  viewer: string;
+  0: string;
+  1: string;
 }>;
 export type TokenMinted = ContractEventLog<{
   minter: string;
@@ -163,6 +175,10 @@ export interface NftAbi extends BaseContract {
     isApprovedForAll(
       owner: string,
       operator: string
+    ): NonPayableTransactionObject<boolean>;
+
+    isNftPublic(
+      tokenId: number | string | BN
     ): NonPayableTransactionObject<boolean>;
 
     isViewer(
@@ -265,6 +281,9 @@ export interface NftAbi extends BaseContract {
     Upgraded(cb?: Callback<Upgraded>): EventEmitter;
     Upgraded(options?: EventOptions, cb?: Callback<Upgraded>): EventEmitter;
 
+    AddViewer(cb?: Callback<AddViewer>): EventEmitter;
+    AddViewer(options?: EventOptions, cb?: Callback<AddViewer>): EventEmitter;
+
     Approval(cb?: Callback<Approval>): EventEmitter;
     Approval(options?: EventOptions, cb?: Callback<Approval>): EventEmitter;
 
@@ -294,6 +313,12 @@ export interface NftAbi extends BaseContract {
 
     Paused(cb?: Callback<Paused>): EventEmitter;
     Paused(options?: EventOptions, cb?: Callback<Paused>): EventEmitter;
+
+    RemoveViewer(cb?: Callback<RemoveViewer>): EventEmitter;
+    RemoveViewer(
+      options?: EventOptions,
+      cb?: Callback<RemoveViewer>
+    ): EventEmitter;
 
     TokenMinted(cb?: Callback<TokenMinted>): EventEmitter;
     TokenMinted(
@@ -326,6 +351,13 @@ export interface NftAbi extends BaseContract {
 
   once(event: "Upgraded", cb: Callback<Upgraded>): void;
   once(event: "Upgraded", options: EventOptions, cb: Callback<Upgraded>): void;
+
+  once(event: "AddViewer", cb: Callback<AddViewer>): void;
+  once(
+    event: "AddViewer",
+    options: EventOptions,
+    cb: Callback<AddViewer>
+  ): void;
 
   once(event: "Approval", cb: Callback<Approval>): void;
   once(event: "Approval", options: EventOptions, cb: Callback<Approval>): void;
@@ -360,6 +392,13 @@ export interface NftAbi extends BaseContract {
 
   once(event: "Paused", cb: Callback<Paused>): void;
   once(event: "Paused", options: EventOptions, cb: Callback<Paused>): void;
+
+  once(event: "RemoveViewer", cb: Callback<RemoveViewer>): void;
+  once(
+    event: "RemoveViewer",
+    options: EventOptions,
+    cb: Callback<RemoveViewer>
+  ): void;
 
   once(event: "TokenMinted", cb: Callback<TokenMinted>): void;
   once(

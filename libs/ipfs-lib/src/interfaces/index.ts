@@ -1,15 +1,14 @@
 import { ModuleMetadata, Type } from '@nestjs/common';
-import * as IpfsCore from 'ipfs-core';
 
 export interface IPFSModuleOptionsFactory {
-  createIPFSOptions(): Promise<IpfsCore.Options> | IpfsCore.Options;
+  createIPFSOptions(): Promise<any> | any;
 }
 
 export interface IPFSModuleAsyncOptions
   extends Pick<ModuleMetadata, 'imports'> {
   useExisting?: Type<IPFSModuleOptionsFactory>;
   useClass?: Type<IPFSModuleOptionsFactory>;
-  useFactory?: (...args: any[]) => Promise<IpfsCore.Options> | IpfsCore.Options;
+  useFactory?: (...args: any[]) => Promise<any> | any;
   inject?: any[];
   imports?: any[];
 }

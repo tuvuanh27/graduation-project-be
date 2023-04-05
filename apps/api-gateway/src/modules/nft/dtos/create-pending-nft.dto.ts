@@ -1,27 +1,27 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { Expose, Type } from 'class-transformer';
-
-export class NftAttributes {
-  @ApiPropertyOptional({ example: 'color' })
-  @IsString()
-  @IsOptional()
-  @Expose({ name: 'trait_type' })
-  traitType?: string;
-
-  @ApiPropertyOptional({ example: 'red' })
-  @IsString()
-  @IsOptional()
-  value?: string;
-}
+import { NftAttributes } from '@libs/database/entities';
 
 export class CreatePendingNftDto {
   @ApiProperty({ example: 'This is NFT name' })
   @IsString()
+  @Expose({ name: 'name' })
   name: string;
+
+  @ApiProperty({ example: true })
+  @IsBoolean()
+  @Expose({ name: 'is_public' })
+  isPublic: boolean;
 
   @ApiProperty({ example: 'This is NFT description' })
   @IsString()
+  @Expose({ name: 'description' })
   description: string;
 
   @ApiPropertyOptional({ example: 'https://example.com' })
@@ -33,6 +33,7 @@ export class CreatePendingNftDto {
   @ApiPropertyOptional({ type: [NftAttributes] })
   @IsOptional()
   @ValidateNested({ each: true })
+  @Expose({ name: 'attributes' })
   @Type(() => NftAttributes)
   attributes?: NftAttributes[];
 }

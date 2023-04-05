@@ -14,7 +14,7 @@ export class UploaderController {
   }
 
   @MessagePattern(KafkaTopic.PENDING_NFT)
-  uploadIpfs(payload: IKafkaPayload<PendingNftKafkaPayload>): string {
-    return this.uploaderService.getHello(payload);
+  uploadIpfs(payload: IKafkaPayload<PendingNftKafkaPayload>) {
+    return this.uploaderService.mintNft(payload);
   }
 }

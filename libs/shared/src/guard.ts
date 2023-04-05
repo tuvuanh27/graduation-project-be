@@ -1,3 +1,9 @@
+import {
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
+
 export class Guard {
   /**
    * Checks if value is empty. Accept strings, numbers, booleans, objects and arrays.
@@ -44,5 +50,16 @@ export class Guard {
         ? Number(value).toString().length
         : value.length;
     return valueLength >= min && valueLength <= max;
+  }
+}
+
+export class AddressRequireGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const address = request.address;
+    if (!address) {
+      throw new UnauthorizedException('Address is required');
+    }
+    return true;
   }
 }
