@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { urlencoded, json } from 'express';
 
 import { EEnvKey } from '@libs/configs/env.constant';
 import { ResponseTransformInterceptor } from '@libs/infra/interceptors/request-response.interceptor';
@@ -18,6 +19,10 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
     ApiGatewayModule,
   );
+
+  // limit 50mb
+  app.use(json({ limit: '50mb' }));
+  app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   const configService = app.get(ConfigService);
   const loggingService = app.get(LoggerService);

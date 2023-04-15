@@ -26,4 +26,19 @@ export enum NftEvent {
   Transfer = 'Transfer',
   ChangeTokenPublic = 'ChangeTokenPublic',
   TokenMinted = 'TokenMinted',
+  AddViewer = 'AddViewer',
+  RemoveViewer = 'RemoveViewer',
+}
+
+export interface INftAttributes {
+  trait_type?: string;
+  value?: string;
+}
+
+export interface IIpfsResponse {
+  name: string;
+  description: string;
+  image: string;
+  external_url?: string;
+  attributes?: INftAttributes[];
 }

@@ -56,10 +56,9 @@ export class ResponseTransformInterceptor<T>
     next: CallHandler,
   ): Observable<IResponse<T>> {
     const nodeEnv = this.configService.get(EEnvKey.NODE_ENV);
-    if (nodeEnv === 'debug') {
+    if (nodeEnv === 'development') {
       const request = context.switchToHttp().getRequest();
-      this.logger.info(
-        request.headers,
+      this.logger.debug(
         request.query,
         request.params,
         request.url,

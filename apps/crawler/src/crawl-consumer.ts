@@ -6,7 +6,13 @@ import { LoggerService } from '@libs/shared';
 import { ModuleRef } from '@nestjs/core';
 import { Job } from 'bull';
 import { IQueueCrawl, NftEvent } from './types';
-import { ChangeTokenPublic, TokenMinted, Transfer } from '@assets/abi/NftAbi';
+import {
+  AddViewer,
+  ChangeTokenPublic,
+  RemoveViewer,
+  TokenMinted,
+  Transfer,
+} from '@assets/abi/NftAbi';
 
 @Processor(CRAWLER_QUEUE)
 export class CrawlConsumer extends BaseConsumer {
@@ -27,9 +33,10 @@ export class CrawlConsumer extends BaseConsumer {
   async crawl(job: Job<IQueueCrawl>) {
     const { fromBlock, toBlock } = job.data;
     const events = await this.crawlerService.getAllEvents(fromBlock, toBlock);
-    this.logger.log(
-      `Crawl ${events.length} events from ${fromBlock} to ${toBlock} block`,
+    this.logger.debug(
+      `[Crawl] Detect ${events.length} events from ${fromBlock} to ${toBlock} block`,
     );
+    this.logger.debug(`[Crawl] Events: ${JSON.stringify(events)} `);
     for (const event of events) {
       switch (event.event) {
         case NftEvent.Transfer:
@@ -37,14 +44,28 @@ export class CrawlConsumer extends BaseConsumer {
             event as unknown as Transfer,
           );
           break;
+
         case NftEvent.TokenMinted:
           await this.crawlerService.handleMintNft(
             event as unknown as TokenMinted,
           );
           break;
+
         case NftEvent.ChangeTokenPublic:
           await this.crawlerService.handleChangePublicNft(
             event as unknown as ChangeTokenPublic,
+          );
+          break;
+
+        case NftEvent.AddViewer:
+          await this.crawlerService.handleAddViewer(
+            event as unknown as AddViewer,
+          );
+          break;
+
+        case NftEvent.RemoveViewer:
+          await this.crawlerService.handleRemoveViewer(
+            event as unknown as RemoveViewer,
           );
           break;
 

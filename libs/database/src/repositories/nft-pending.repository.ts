@@ -4,7 +4,7 @@ import {
   NftPending,
   NftPendingDocument,
 } from '@libs/database/entities/nft-pending.schema';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 
 export class NftPendingRepository extends BaseRepository {
   constructor(
@@ -35,8 +35,25 @@ export class NftPendingRepository extends BaseRepository {
       .exec();
   }
 
+  async updateNftPendingByFilter(
+    filter: FilterQuery<NftPendingDocument>,
+    nftPendingDocument: Partial<NftPendingDocument>,
+  ) {
+    return this.nftPendingDocumentModel
+      .updateOne(filter, nftPendingDocument, {
+        new: true,
+      })
+      .exec();
+  }
+
   getNftPendingByOwner(owner: string): Promise<NftPendingDocument[]> {
-    return this.nftPendingDocumentModel.find({ owner }).exec();
+    return this.nftPendingDocumentModel.find({ owner, ipfsHash: null }).exec();
+  }
+
+  getNftReadyByOwner(owner: string): Promise<NftPendingDocument[]> {
+    return this.nftPendingDocumentModel
+      .find({ owner, ipfsHash: { $ne: null }, isUploaded: false })
+      .exec();
   }
 
   deleteNftPending(pendingId: string) {

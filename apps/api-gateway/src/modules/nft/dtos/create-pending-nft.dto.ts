@@ -1,11 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
+  IsIn,
+  IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Expose, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { NftAttributes } from '@libs/database/entities';
 
 export class CreatePendingNftDto {
@@ -14,10 +16,11 @@ export class CreatePendingNftDto {
   @Expose({ name: 'name' })
   name: string;
 
-  @ApiProperty({ example: true })
-  @IsBoolean()
+  @ApiProperty({ example: 1 })
   @Expose({ name: 'is_public' })
-  isPublic: boolean;
+  // 0 or 1
+  @IsIn([0, 1])
+  isPublic: number;
 
   @ApiProperty({ example: 'This is NFT description' })
   @IsString()

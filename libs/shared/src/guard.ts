@@ -56,7 +56,9 @@ export class Guard {
 export class AddressRequireGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const address = request.address;
+    // get address from headers
+    const address = request.headers.address;
+
     if (!address) {
       throw new UnauthorizedException('Address is required');
     }

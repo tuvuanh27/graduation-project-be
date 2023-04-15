@@ -26,6 +26,12 @@ import { NftTransferRepository } from '@libs/database/repositories/nft-transfer.
 import { NftRepository } from '@libs/database/repositories/nft.repository';
 import { RedisModule } from '@libs/redis';
 import { CRAWLER_CACHE } from '@libs/redis/constants';
+import {
+  NftPending,
+  NftPendingSchemaInstance,
+} from '@libs/database/entities/nft-pending.schema';
+import { NftPendingRepository } from '@libs/database/repositories/nft-pending.repository';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -48,9 +54,14 @@ import { CRAWLER_CACHE } from '@libs/redis/constants';
       { name: LatestBlock.name, schema: LatestBlockSchemaInstance },
       { name: NftTransfer.name, schema: NftTransferSchemaInstance },
       { name: Nft.name, schema: NftSchemaInstance },
+      { name: NftPending.name, schema: NftPendingSchemaInstance },
     ]),
     RedisModule.registerAsync(CRAWLER_CACHE),
     QueueModule,
+    HttpModule.register({
+      timeout: 180000, // 3 minutes
+      maxRedirects: 5,
+    }),
   ],
   controllers: [CrawlerController],
   providers: [
@@ -58,6 +69,7 @@ import { CRAWLER_CACHE } from '@libs/redis/constants';
     LatestBlockRepository,
     NftTransferRepository,
     NftRepository,
+    NftPendingRepository,
     CrawlConsumer,
   ],
 })

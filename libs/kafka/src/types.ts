@@ -1,9 +1,11 @@
-import { NftAttributes } from '@libs/database/entities';
-import { Expose } from 'class-transformer';
-
 export interface IKafkaPayload<T> {
   data: T;
   createdAt: number;
+}
+
+export interface INftAttributes {
+  trait_type?: string;
+  value?: string;
 }
 
 export class PendingNftKafkaPayload {
@@ -12,7 +14,7 @@ export class PendingNftKafkaPayload {
   description: string;
   image: string;
   externalUrl?: string;
-  attributes?: NftAttributes[];
+  attributes?: INftAttributes[];
   isPublic: boolean;
   owner: string;
 }

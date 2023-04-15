@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "name": "api-gateway",
+      "script": "yarn start:dev api-gateway"
+    },
+    {
+      "name": "uploader",
+      "script": "yarn start:dev uploader"
+    }
+  ]
+}

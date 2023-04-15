@@ -31,6 +31,9 @@ export class NftPending extends BaseSchema {
 
   @Prop({ required: true, default: false, type: Boolean })
   isUploaded: boolean;
+
+  @Prop({ required: false, type: String })
+  nftId: string;
 }
 
 export const NftPendingSchemaInstance =

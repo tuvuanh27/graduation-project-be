@@ -13,7 +13,7 @@ export type NftTransferDocument = NftTransfer & BaseDocument;
   virtuals: true,
 })
 export class NftTransfer extends BaseSchema {
-  @Prop({ required: true, unique: true, type: String })
+  @Prop({ required: true, type: String })
   tokenId: string;
 
   @Prop({ required: true, type: String })

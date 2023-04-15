@@ -29,7 +29,7 @@ export class NftRepository extends BaseRepository {
       .exec();
   }
 
-  async updateOwnerNft(owner: string, tokenId: string) {
+  async updateOwnerNft(tokenId: string, owner: string) {
     return this.nftDocumentModel
       .updateOne({ tokenId }, { owner }, { new: true })
       .exec();

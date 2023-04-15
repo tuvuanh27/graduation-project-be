@@ -45,9 +45,9 @@ export class NFTMetadata {
 
   @ApiPropertyOptional({ type: [NftAttributes] })
   @IsOptional()
-  @Type(() => NftAttributes)
   @ValidateNested({ each: true })
-  @Expose({ name: 'attributes' })
+  @Type(() => NftAttributes)
+  @Expose()
   attributes?: NftAttributes[];
 }
 

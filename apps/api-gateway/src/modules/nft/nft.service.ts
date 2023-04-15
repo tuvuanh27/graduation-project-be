@@ -7,16 +7,18 @@ import { CreatePendingNftDto } from '@app/modules/nft/dtos/create-pending-nft.dt
 import { CloudinaryService } from '@libs/shared/modules/cloudinary';
 import { UploadApiResponse } from 'cloudinary';
 import { KafkaTopic } from '@libs/kafka/constants';
-import { PendingNftKafkaPayload } from '@libs/kafka/types';
+import { INftAttributes, PendingNftKafkaPayload } from '@libs/kafka/types';
 import { NftRepository } from '@libs/database/repositories/nft.repository';
 import { NftPendingRepository } from '@libs/database/repositories/nft-pending.repository';
-import { NFTMetadata } from '@libs/database/entities';
-import { instanceToPlain } from 'class-transformer';
+import { NftAttributes, NFTMetadata } from '@libs/database/entities';
 import { UpdatePendingNftDto } from '@app/modules/nft/dtos/update-pending-nft.dto';
+import { instanceToInstance, instanceToPlain } from 'class-transformer';
+import { NftPendingDocument } from '@libs/database/entities/nft-pending.schema';
 
 @Injectable()
 export class NftService implements OnModuleInit {
   private web3: Web3;
+
   constructor(
     private readonly kafkaService: KafkaService,
     private loggerService: LoggerService,
@@ -25,6 +27,7 @@ export class NftService implements OnModuleInit {
     private readonly nftRepository: NftRepository,
     private readonly nftPendingRepository: NftPendingRepository,
   ) {}
+
   private readonly logger = this.loggerService.getLogger(NftService.name);
 
   async onModuleInit() {
@@ -61,7 +64,7 @@ export class NftService implements OnModuleInit {
 
       return this.nftPendingRepository.createNftPending({
         uri: secureUrl,
-        isPublic: pendingNft.isPublic,
+        isPublic: !!pendingNft.isPublic,
         owner: address,
         metadata,
       });
@@ -74,11 +77,21 @@ export class NftService implements OnModuleInit {
   async createNftOnChain(nftPendingId: string) {
     // TODO: move it to queue
     try {
-      const pendingNft = await this.nftPendingRepository.getNftPendingById(
-        nftPendingId,
-      );
+      const pendingNft: NftPendingDocument =
+        await this.nftPendingRepository.getNftPendingById(nftPendingId);
       if (!pendingNft) {
         throw new BadRequestException({ message: 'Nft pending not found' });
+      }
+
+      const attributes: INftAttributes[] = [];
+
+      if (pendingNft.metadata.attributes) {
+        pendingNft.metadata.attributes.forEach((attr) => {
+          attributes.push({
+            trait_type: attr.traitType,
+            value: attr.value,
+          });
+        });
       }
 
       await this.kafkaService.send<PendingNftKafkaPayload>(
@@ -94,8 +107,10 @@ export class NftService implements OnModuleInit {
             ...(pendingNft.metadata.externalUrl
               ? { externalUrl: pendingNft.metadata.externalUrl }
               : {}),
-            ...(pendingNft.metadata.attributes
-              ? { attributes: pendingNft.metadata.attributes }
+            ...(attributes.length > 0
+              ? {
+                  attributes,
+                }
               : {}),
           },
           createdAt: Date.now(),
@@ -112,11 +127,16 @@ export class NftService implements OnModuleInit {
     return this.nftPendingRepository.getNftPendingByOwner(address);
   }
 
+  getListReadyNftByOwner(address: string) {
+    return this.nftPendingRepository.getNftReadyByOwner(address);
+  }
+
   async getListNft(tokenIds: string[], address: string) {
     return this.nftRepository.getNftByTokenIds(tokenIds, address);
   }
 
-  getPublicNft() {
+  getPublicNft(q: string) {
+    if (q) return this.nftRepository.searchNftOnchain(q);
     return this.nftRepository.getPublicNft();
   }
 

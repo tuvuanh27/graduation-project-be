@@ -12,15 +12,18 @@ import { CreatePendingNftDto } from '@app/modules/nft/dtos/create-pending-nft.dt
 import {
   Body,
   Param,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiProperty } from '@nestjs/swagger';
+import { ApiConsumes } from '@nestjs/swagger';
 import { ApiImplicitFile } from '@nestjs/swagger/dist/decorators/api-implicit-file.decorator';
 import { ListNftIdDto } from '@app/modules/nft/dtos/list-nft-id.dto';
 import { UpdatePendingNftDto } from '@app/modules/nft/dtos/update-pending-nft.dto';
+import { UploadMetadataIpfsDto } from '@app/modules/nft/dtos/upload-metadata-ipfs.dto';
+import { SearchDto } from '@app/modules/nft/dtos/search.dto';
 
 @Controller('nft')
 export class NftController {
@@ -53,8 +56,8 @@ export class NftController {
   @Get('/public-nft', {
     description: 'Get list public nft onchain, to display on home page',
   })
-  async getPublicNft() {
-    return await this.nftService.getPublicNft();
+  async getPublicNft(@Query('q') q: string) {
+    return await this.nftService.getPublicNft(q);
   }
 
   @Post('/create-pending', {
@@ -72,12 +75,12 @@ export class NftController {
     return await this.nftService.createPending(body, file, address);
   }
 
-  @Post('/upload-metadata-to-ipfs/:pendingId', {
+  @Post('/upload-metadata-to-ipfs', {
     description:
       'Upload metadata to ipfs, then update ipfs hash to pending nft',
   })
-  async uploadMetadataToIpfs(@Param('pendingId') pendingId: string) {
-    return await this.nftService.createNftOnChain(pendingId);
+  async uploadMetadataToIpfs(@Body() data: UploadMetadataIpfsDto) {
+    return await this.nftService.createNftOnChain(data.nftId);
   }
 
   @Get('/get-pending-nft', {
@@ -86,6 +89,14 @@ export class NftController {
   @UseGuards(AddressRequireGuard)
   async getPendingNft(@CurrentAddress() address: string) {
     return await this.nftService.getListPendingNftByOwner(address);
+  }
+
+  @Get('/get-ready-onchain', {
+    description: 'Get list ready nft of owner address',
+  })
+  @UseGuards(AddressRequireGuard)
+  async getReadyNft(@CurrentAddress() address: string) {
+    return await this.nftService.getListReadyNftByOwner(address);
   }
 
   @Put('/update-nft/:pendingId', {
@@ -100,11 +111,11 @@ export class NftController {
     return await this.nftService.updateNft(pendingId, body, address);
   }
 
-  @Post('search-nft-onchain', {
+  @Post('/search-nft-onchain', {
     description: 'Search nft onchain by name or description',
   })
-  async searchNftOnchain(@Body() q: string) {
-    return await this.nftService.searchNftOnchain(q);
+  async searchNftOnchain(@Body() data: SearchDto) {
+    return await this.nftService.searchNftOnchain(data.q);
   }
 
   @Delete('/delete-pending-nft/:pendingId', {
