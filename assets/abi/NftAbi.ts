@@ -57,6 +57,14 @@ export type ApprovalForAll = ContractEventLog<{
   1: string;
   2: boolean;
 }>;
+export type BuyToken = ContractEventLog<{
+  tokenId: string;
+  buyer: string;
+  price: string;
+  0: string;
+  1: string;
+  2: string;
+}>;
 export type ChangeTokenPublic = ContractEventLog<{
   tokenId: string;
   isPublic: boolean;
@@ -80,6 +88,12 @@ export type Paused = ContractEventLog<{
 export type RemoveViewer = ContractEventLog<{
   tokenId: string;
   viewer: string;
+  0: string;
+  1: string;
+}>;
+export type SaleToken = ContractEventLog<{
+  tokenId: string;
+  price: string;
   0: string;
   1: string;
 }>;
@@ -153,6 +167,8 @@ export interface NftAbi extends BaseContract {
 
     burn(tokenId: number | string | BN): NonPayableTransactionObject<void>;
 
+    buyToken(tokenId: number | string | BN): PayableTransactionObject<void>;
+
     changeTokenPublic(
       tokenId: number | string | BN,
       isPublic: boolean
@@ -223,6 +239,8 @@ export interface NftAbi extends BaseContract {
       data: string | number[]
     ): NonPayableTransactionObject<void>;
 
+    salePrice(arg0: number | string | BN): NonPayableTransactionObject<string>;
+
     setApprovalForAll(
       operator: string,
       approved: boolean
@@ -230,6 +248,11 @@ export interface NftAbi extends BaseContract {
 
     setMintingFee(
       _mintingFee: number | string | BN
+    ): NonPayableTransactionObject<void>;
+
+    setSalePrice(
+      tokenId: number | string | BN,
+      price: number | string | BN
     ): NonPayableTransactionObject<void>;
 
     supportsInterface(
@@ -293,6 +316,9 @@ export interface NftAbi extends BaseContract {
       cb?: Callback<ApprovalForAll>
     ): EventEmitter;
 
+    BuyToken(cb?: Callback<BuyToken>): EventEmitter;
+    BuyToken(options?: EventOptions, cb?: Callback<BuyToken>): EventEmitter;
+
     ChangeTokenPublic(cb?: Callback<ChangeTokenPublic>): EventEmitter;
     ChangeTokenPublic(
       options?: EventOptions,
@@ -319,6 +345,9 @@ export interface NftAbi extends BaseContract {
       options?: EventOptions,
       cb?: Callback<RemoveViewer>
     ): EventEmitter;
+
+    SaleToken(cb?: Callback<SaleToken>): EventEmitter;
+    SaleToken(options?: EventOptions, cb?: Callback<SaleToken>): EventEmitter;
 
     TokenMinted(cb?: Callback<TokenMinted>): EventEmitter;
     TokenMinted(
@@ -369,6 +398,9 @@ export interface NftAbi extends BaseContract {
     cb: Callback<ApprovalForAll>
   ): void;
 
+  once(event: "BuyToken", cb: Callback<BuyToken>): void;
+  once(event: "BuyToken", options: EventOptions, cb: Callback<BuyToken>): void;
+
   once(event: "ChangeTokenPublic", cb: Callback<ChangeTokenPublic>): void;
   once(
     event: "ChangeTokenPublic",
@@ -398,6 +430,13 @@ export interface NftAbi extends BaseContract {
     event: "RemoveViewer",
     options: EventOptions,
     cb: Callback<RemoveViewer>
+  ): void;
+
+  once(event: "SaleToken", cb: Callback<SaleToken>): void;
+  once(
+    event: "SaleToken",
+    options: EventOptions,
+    cb: Callback<SaleToken>
   ): void;
 
   once(event: "TokenMinted", cb: Callback<TokenMinted>): void;

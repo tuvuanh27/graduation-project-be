@@ -11,8 +11,10 @@ import { IIpfsResponse, IQueueCrawl, TransactionConfig } from './types';
 import { EventData } from 'web3-eth-contract';
 import {
   AddViewer,
+  BuyToken,
   ChangeTokenPublic,
   RemoveViewer,
+  SaleToken,
   TokenMinted,
   Transfer,
 } from '@assets/abi/NftAbi';
@@ -28,7 +30,7 @@ import Redis from 'ioredis';
 import { CRAWLER_CACHE } from '@libs/redis/constants';
 import { NftPendingRepository } from '@libs/database/repositories/nft-pending.repository';
 import { HttpService } from '@nestjs/axios';
-import { lastValueFrom, Observable } from 'rxjs';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class CrawlerService implements OnModuleInit {
@@ -294,5 +296,15 @@ export class CrawlerService implements OnModuleInit {
       });
 
     await this.nftRepository.updateNftViewers(tokenId, viewers);
+  }
+
+  async handleSaleNft(event: SaleToken) {
+    const { tokenId, price } = event.returnValues;
+    await this.nftRepository.updateNftPrice(tokenId, price);
+  }
+
+  async handleBuyNft(event: BuyToken) {
+    const { tokenId } = event.returnValues;
+    await this.nftRepository.updateNftPrice(tokenId, '0');
   }
 }

@@ -128,4 +128,19 @@ export class NftController {
   ) {
     return await this.nftService.deletePendingNft(pendingId, address);
   }
+
+  @Get('/get-nft-on-sale')
+  async getNftOnSale() {
+    return await this.nftService.getNftOnSale();
+  }
+
+  @Get('/get-nft-top-transfer')
+  async getNftTopTransfer() {
+    return await this.nftService.getTopNftTransfer();
+  }
+
+  @Get('/get-transfer-history/:nftId')
+  async getTransferHistory(@Param('nftId') nftId: string) {
+    return await this.nftService.getTransferHistoryByTokenId(nftId);
+  }
 }

@@ -7,6 +7,10 @@
     {
       "name": "uploader",
       "script": "yarn start:dev uploader"
+    },
+    {
+      "name": "crawler",
+      "script": "yarn start:dev crawler"
     }
   ]
 }

@@ -8,8 +8,10 @@ import { Job } from 'bull';
 import { IQueueCrawl, NftEvent } from './types';
 import {
   AddViewer,
+  BuyToken,
   ChangeTokenPublic,
   RemoveViewer,
+  SaleToken,
   TokenMinted,
   Transfer,
 } from '@assets/abi/NftAbi';
@@ -67,6 +69,16 @@ export class CrawlConsumer extends BaseConsumer {
           await this.crawlerService.handleRemoveViewer(
             event as unknown as RemoveViewer,
           );
+          break;
+
+        case NftEvent.SaleToken:
+          await this.crawlerService.handleSaleNft(
+            event as unknown as SaleToken,
+          );
+          break;
+
+        case NftEvent.BuyToken:
+          await this.crawlerService.handleBuyNft(event as unknown as BuyToken);
           break;
 
         default:

@@ -44,7 +44,20 @@ export class UploaderService implements OnModuleInit {
     return 'Hello Kafka!';
   }
 
+  async handleMint(payload: IKafkaPayload<PendingNftKafkaPayload>) {
+    const isUseLocal =
+      this.configService.get<string>(EEnvKey.USE_LOCAL_IPFS) === 'true';
+    if (isUseLocal) {
+      return this.mintNft(payload);
+    } else {
+      return this.mintNftByPitana(payload);
+    }
+  }
+
   async mintNft(payload: IKafkaPayload<PendingNftKafkaPayload>) {
+    this.logger.debug(
+      `[uploadIpfs] payload local : ${JSON.stringify(payload)}`,
+    );
     const data = instanceToPlain(payload.data);
     this.logger.log(`[uploadIpfs] data: ${JSON.stringify(data)}`);
 

@@ -47,7 +47,10 @@ export class NftRepository extends BaseRepository {
     owner: string,
     filter?: FilterQuery<NftDocument>,
   ): Promise<NftDocument[]> {
-    return this.nftDocumentModel.find({ owner, ...filter }).exec();
+    return this.nftDocumentModel
+      .find({ owner, ...filter })
+      .sort({ price: -1 })
+      .exec();
   }
 
   getPublicNft() {
@@ -86,5 +89,22 @@ export class NftRepository extends BaseRepository {
         isPublic: true,
       })
       .exec();
+  }
+
+  async updateNftPrice(tokenId: string, price: string) {
+    return this.nftDocumentModel
+      .findOneAndUpdate({ tokenId }, { price }, { new: true })
+      .exec();
+  }
+
+  async getNftOnSale() {
+    return this.nftDocumentModel
+      .find({ price: { $gt: 0 } })
+      .sort({ price: 1 })
+      .exec();
+  }
+
+  async getListNftByTokenIds(tokenIds: string[]): Promise<NftDocument[]> {
+    return this.nftDocumentModel.find({ tokenId: { $in: tokenIds } }).exec();
   }
 }

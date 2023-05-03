@@ -10,10 +10,10 @@ import { KafkaTopic } from '@libs/kafka/constants';
 import { INftAttributes, PendingNftKafkaPayload } from '@libs/kafka/types';
 import { NftRepository } from '@libs/database/repositories/nft.repository';
 import { NftPendingRepository } from '@libs/database/repositories/nft-pending.repository';
-import { NftAttributes, NFTMetadata } from '@libs/database/entities';
+import { NFTMetadata } from '@libs/database/entities';
 import { UpdatePendingNftDto } from '@app/modules/nft/dtos/update-pending-nft.dto';
-import { instanceToInstance, instanceToPlain } from 'class-transformer';
 import { NftPendingDocument } from '@libs/database/entities/nft-pending.schema';
+import { NftTransferRepository } from '@libs/database/repositories/nft-transfer.repository';
 
 @Injectable()
 export class NftService implements OnModuleInit {
@@ -26,6 +26,7 @@ export class NftService implements OnModuleInit {
     private readonly cloudinaryService: CloudinaryService,
     private readonly nftRepository: NftRepository,
     private readonly nftPendingRepository: NftPendingRepository,
+    private readonly nftTransferRepository: NftTransferRepository,
   ) {}
 
   private readonly logger = this.loggerService.getLogger(NftService.name);
@@ -175,5 +176,42 @@ export class NftService implements OnModuleInit {
     }
 
     return this.nftPendingRepository.deleteNftPending(pendingId);
+  }
+
+  async getNftOnSale() {
+    const nftOnsale = await this.nftRepository.getNftOnSale();
+    const nftIds = nftOnsale.map((item) => item.tokenId);
+
+    const listNumberTransfer =
+      await this.nftTransferRepository.getNumberOfNftTransfers(nftIds);
+    return nftOnsale.map((item) => {
+      return {
+        numberOfTransfer:
+          listNumberTransfer.find((e) => e._id === item.tokenId)?.count || 0,
+        ...item.toJSON(),
+      };
+    });
+  }
+
+  async getTopNftTransfer() {
+    const listTransfer = await this.nftTransferRepository.getTopNftTransfers();
+    const listTokenId = listTransfer.map((item) => item._id);
+    const nftTopTransfer = await this.nftRepository.getListNftByTokenIds(
+      listTokenId,
+    );
+
+    return nftTopTransfer
+      .map((item) => {
+        return {
+          numberOfTransfer:
+            listTransfer.find((e) => e._id === item.tokenId)?.count || 0,
+          ...item.toJSON(),
+        };
+      })
+      .sort((a, b) => b.numberOfTransfer - a.numberOfTransfer);
+  }
+
+  getTransferHistoryByTokenId(tokenId: string) {
+    return this.nftTransferRepository.getNftTransfersByTokenId(tokenId);
   }
 }

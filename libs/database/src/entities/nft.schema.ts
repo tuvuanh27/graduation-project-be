@@ -92,6 +92,9 @@ export class Nft extends BaseSchema {
 
   @Prop({ required: true, type: Number })
   blockTimeCreated: number;
+
+  @Prop({ default: '0', type: String })
+  price: string;
 }
 
 const NftSchemaInstance = SchemaFactory.createForClass(Nft);

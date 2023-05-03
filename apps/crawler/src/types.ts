@@ -28,6 +28,8 @@ export enum NftEvent {
   TokenMinted = 'TokenMinted',
   AddViewer = 'AddViewer',
   RemoveViewer = 'RemoveViewer',
+  SaleToken = 'SaleToken',
+  BuyToken = 'BuyToken',
 }
 
 export interface INftAttributes {
