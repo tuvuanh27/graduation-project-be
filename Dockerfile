@@ -1,30 +1,15 @@
-FROM node:18 AS dist
+FROM node:16.19.0
+
+WORKDIR /app
+
 COPY package.json yarn.lock ./
 
-RUN yarn install
+RUN npm install -g @nestjs/cli ts-node && yarn install
 
-COPY . ./
+COPY . .
 
-RUN yarn build:prod
+RUN yarn build api-gateway
 
-FROM node:18 AS node_modules
-COPY package.json yarn.lock ./
+RUN yarn build crawler
 
-RUN yarn install --prod
-
-FROM node:18
-
-ARG PORT=3000
-
-RUN mkdir -p /usr/src/app
-
-WORKDIR /usr/src/app
-
-COPY --from=dist dist /usr/src/app/dist
-COPY --from=node_modules node_modules /usr/src/app/node_modules
-
-COPY . /usr/src/app
-
-EXPOSE $PORT
-
-CMD [ "yarn", "start:prod" ]
+RUN yarn build uploader
